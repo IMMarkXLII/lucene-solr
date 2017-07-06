@@ -800,7 +800,19 @@ public class SimpleFacets {
               List<String> terms = StrUtils.splitSmart(termList, ",", true);
               result.add(key, getListedTermCounts(facetValue, parsed, terms));
             } else {
-              result.add(key, getTermCounts(facetValue, parsed));
+              NamedList<Integer> listNew=getTermCounts(facetValue, parsed);
+            	Map<String, String> lowercasedFacetMap=new HashMap<>();
+            	listNew.forEach(item->{
+            		String lowercaseKey=item.getKey().toLowerCase();
+            		if(lowercasedFacetMap.get(lowercaseKey)==null)
+            			lowercasedFacetMap.put(lowercaseKey, item.getKey()+","+item.getValue());
+            		else{
+            			lowercasedFacetMap.put(lowercaseKey, " OR "+item.getKey()+","+(item.getValue()+Integer.parseInt(lowercasedFacetMap.get(lowercaseKey).split(",")[1])));
+            		}
+            		
+            	});
+            	System.out.println(lowercasedFacetMap);
+              result.add(key, listNew);
             }
             return result;
           } catch (SolrException se) {
